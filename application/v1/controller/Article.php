@@ -3,6 +3,7 @@
 namespace app\v1\controller;
 
 use app\common\model\ArticleModel;
+use app\common\model\CategoryModel;
 use Ramsey\Uuid\Uuid;
 use Status;
 
@@ -25,19 +26,26 @@ class Article extends Base {
         $offset = $this->get['offset'];
         $limit = $this->get['limit'];
         $where = [];
-        if (array_key_exists('title', $this->get)) {
-            $title = $this->get['title'];
-            $where['title'] = $title;
+        if (isset($this->get['title'])) {
+            $where['title'] = $this->get['title'];
         }
-//        d($where);
-        $list = $this->model->where($where)->where('status','<>',Status::$Delete)->all();
-        $data = $this->model->where($where)->where('status','<>',Status::$Delete)->limit($offset * $limit, $limit)->all();
+        if (isset($this->get['categoryId'])) {
+            $where['categoryId'] = $this->get['categoryId'];
+        }
+        $list = $this->model->where($where)->where('status', '<>', Status::$Delete)->all();
+        $data = $this->model->where($where)->where('status', '<>', Status::$Delete)->limit($offset * $limit, $limit)->all();
+        //一定要调用一下，才有值
+        foreach ($data as &$item) {
+             $item->category;
+        }
         return success(['count' => count($list), 'list' => $data]);
     }
 
     //获取一条数据
     public function one() {
         $data = $this->model->find(['id' => $this->get['id']]);
+        //一定要调用一下，才有值
+        $data->category;
         return success(['count' => 1, 'list' => $data]);
     }
 
@@ -47,6 +55,10 @@ class Article extends Base {
         $limit = $this->get['limit'];
         $list = $this->model->where(['status' => Status::$Normal])->all();
         $data = $this->model->where(['status' => Status::$Normal])->limit($offset * $limit, $limit)->all();
+        //一定要调用一下，才有值
+        foreach ($data as &$item) {
+            $item->category;
+        }
         return success(['count' => count($list), 'list' => $data]);
     }
 
@@ -57,7 +69,7 @@ class Article extends Base {
         $title = $this->data['title'];
         $post = $this->model->where(['title' => $title])->find();
         if ($post) {
-            return fail($post, '已经存在这条数据了');
+            return fail($post, '标题不能重复');
         }
         $this->data['id'] = Uuid::uuid4()->toString();
         $result = $this->model->allowField(true)->save($this->data);
@@ -69,7 +81,7 @@ class Article extends Base {
 
     //编辑
     public function edit() {
-        $result = $this->model->allowField(true)->save($this->data,['id'=>$this->data['id']]);
+        $result = $this->model->allowField(true)->save($this->data, ['id' => $this->data['id']]);
         if ($result) {
             return success($this->data, '修改成功');
         }
