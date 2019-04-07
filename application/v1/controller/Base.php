@@ -31,7 +31,8 @@ class Base extends Controller {
     }
 
     public function checkRoute() {
-        $token = Request::header('Authorization');
+        $token = Request::header('access-token');
+//        d($token);
 //        $token = substr($token, 7, strlen($token));
         if ($this->isInWhiteList(Request::baseUrl())) {
             //路由白名单
