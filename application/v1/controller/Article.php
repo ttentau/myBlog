@@ -36,7 +36,7 @@ class Article extends Base {
         $data = $this->model->where($where)->where('status', '<>', Status::$Delete)->limit($offset * $limit, $limit)->all();
         //一定要调用一下，才有值
         foreach ($data as &$item) {
-             $item->category;
+            $item->category;
         }
         return success(['count' => count($list), 'list' => $data]);
     }
@@ -62,6 +62,12 @@ class Article extends Base {
         //一定要调用一下，才有值
         foreach ($data as &$item) {
             $item->category;
+        }
+
+        //如果有title这个属性的话，说明是筛选一条，那么给这条的点击数加1
+        if (isset($this->get['title'])) {
+            $data[0]->clickCount = $data[0]->clickCount + 1;
+            $data[0]->save();
         }
         return success(['count' => count($list), 'list' => $data]);
     }
