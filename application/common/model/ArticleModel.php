@@ -9,4 +9,5 @@ class ArticleModel extends BaseModel {
     public function category() {
         return $this->hasOne('CategoryModel','id','categoryId');
     }
+
 }

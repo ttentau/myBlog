@@ -53,8 +53,12 @@ class Article extends Base {
     public function show() {
         $offset = $this->get['offset'];
         $limit = $this->get['limit'];
-        $list = $this->model->where(['status' => Status::$Normal])->all();
-        $data = $this->model->where(['status' => Status::$Normal])->limit($offset * $limit, $limit)->all();
+        $where = [];
+        if (isset($this->get['title'])) {
+            $where['title'] = $this->get['title'];
+        }
+        $list = $this->model->where($where)->where(['status' => Status::$Normal])->all();
+        $data = $this->model->where($where)->where(['status' => Status::$Normal])->limit($offset * $limit, $limit)->all();
         //一定要调用一下，才有值
         foreach ($data as &$item) {
             $item->category;

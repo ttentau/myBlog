@@ -17,7 +17,7 @@ class Base extends Controller {
 
     public function __construct(App $app = null) {
         $this->checkRequestType();//一定要比tp先初始化
-//        $this->checkRoute();
+        $this->checkRoute();
         parent::__construct($app);
 
     }
@@ -31,21 +31,13 @@ class Base extends Controller {
     }
 
     public function checkRoute() {
-        $data = input('post.');
-        $token = Request::header('AccessToken');
+        $token = Request::header('Authorization');
+//        $token = substr($token, 7, strlen($token));
         if ($this->isInWhiteList(Request::baseUrl())) {
             //路由白名单
         } else {
             $result = verifyToken($token);
-            if ($result) {
-                $token = (array)$result;
-                if ($token['id'] === $data['CreateBy'] && $token['exp'] > time()) {
-
-                } else {
-                    echo "{\"status\":-1,\"msg\":\"token失效\",\"data\":\"\"}";
-                    die();
-                }
-            } else {
+            if (!$result) {
                 echo "{\"status\":-1,\"msg\":\"token失效\",\"data\":\"\"}";
                 die();
             }
@@ -53,12 +45,7 @@ class Base extends Controller {
     }
 
     public function isInWhiteList($url) {
-        $whiteList = ['register', 'login','AndroidUploadFile',
-            'getPatientsBySn', 'getPatientDrugs','getAlarmClocks','getOneClinical',
-            'checkLastVersion','downloadApk',
-            'download-apk','check-last-version','change-password','get-one-day-takedrugrecords','get-all-takedrugrecords','get-alarm-clocks',
-            'get-token','get-image','get-patient-drugs','get-one-clinical','get-patients-by-sn'
-        ];
+        $whiteList = ['/v1/user/login','/v1/article/show'];
         $result = false;
         foreach ($whiteList as $item) {
             if (strpos($url, $item) !== false) {
