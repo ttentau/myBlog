@@ -33,7 +33,7 @@ class Article extends Base {
             $where['categoryId'] = $this->get['categoryId'];
         }
         $list = $this->model->where($where)->where('status', '<>', Status::$Delete)->all();
-        $data = $this->model->where($where)->where('status', '<>', Status::$Delete)->limit($offset * $limit, $limit)->all();
+        $data = $this->model->where($where)->where('status', '<>', Status::$Delete)->order('createTime', 'desc')->limit($offset * $limit, $limit)->all();
         //一定要调用一下，才有值
         foreach ($data as &$item) {
             $item->category;
@@ -58,7 +58,7 @@ class Article extends Base {
             $where['title'] = $this->get['title'];
         }
         $list = $this->model->where($where)->where(['status' => Status::$Normal])->all();
-        $data = $this->model->where($where)->where(['status' => Status::$Normal])->limit($offset * $limit, $limit)->all();
+        $data = $this->model->where($where)->where(['status' => Status::$Normal])->order('createTime', 'desc')->limit($offset * $limit, $limit)->all();
         //一定要调用一下，才有值
         foreach ($data as &$item) {
             $item->category;
