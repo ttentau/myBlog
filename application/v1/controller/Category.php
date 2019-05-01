@@ -49,11 +49,18 @@ class Category extends Base {
         if (!$category) {
             return fail('', '没有这条数据');
         }
+        $articles = model('ArticleModel')->where(['categoryId' => $category->id])->all();
+        if (count($articles)){
+            foreach ($articles as $article){
+                $article->category;
+            }
+            return fail($articles, '还有关联的文章');
+        }
         $result = $category->delete();
         if ($result) {
-            return success($result, '回收成功');
+            return success($result, '删除成功');
         }
-        return fail($result, '回收失败');
+        return fail($result, '删除失败');
     }
 
     public function edit() {

@@ -19,15 +19,15 @@ class Base extends Controller {
         $this->checkRequestType();//一定要比tp先初始化
         $this->checkRoute();
         parent::__construct($app);
-
     }
+
 
     //检测option请求
     public function checkRequestType() {
         if (request()->method() == 'OPTIONS') {
+            response([], 200, [], 'json')->send();
             die();
         }
-
     }
 
     public function checkRoute() {
@@ -39,14 +39,14 @@ class Base extends Controller {
         } else {
             $result = verifyToken($token);
             if (!$result) {
-                echo "{\"status\":-1,\"msg\":\"token失效\",\"data\":\"\"}";
+                response(["status" => -1, "msg" => 'token失效', "data" => []], 401, [], 'json')->send();
                 die();
             }
         }
     }
 
     public function isInWhiteList($url) {
-        $whiteList = ['/v1/user/login','/v1/article/show'];
+        $whiteList = ['/v1/user/login', '/v1/article/show'];
         $result = false;
         foreach ($whiteList as $item) {
             if (strpos($url, $item) !== false) {

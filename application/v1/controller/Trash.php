@@ -45,6 +45,24 @@ class Trash extends Base {
         return fail($result, '恢复失败');
     }
 
+    //批量恢复
+    public function restoreMore() {
+        $failResult = [];
+        foreach ($this->data as $item){
+            $post = $this->model->get($item['id']);
+            if (!$post) {
+                $failResult[] = $item;
+            }else{
+                $post->status = Status::$Normal;
+                $result = $post->save();
+                if (!$result){
+                    $failResult[] = $item;
+                }
+            }
+        }
+        return success($failResult, '恢复完成');
+    }
+
     //删除
     public function del() {
         $post = $this->model->get(input('get.id'));

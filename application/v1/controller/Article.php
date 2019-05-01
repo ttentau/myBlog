@@ -4,6 +4,7 @@ namespace app\v1\controller;
 
 use app\common\model\ArticleModel;
 use app\common\model\CategoryModel;
+use app\common\model\MessageModel;
 use Ramsey\Uuid\Uuid;
 use Status;
 
@@ -18,7 +19,6 @@ class Article extends Base {
         $this->model = new ArticleModel();
         $this->data = input('post.');
         $this->get = input('get.');
-
     }
 
     //获取所有数据
@@ -29,9 +29,7 @@ class Article extends Base {
         if (isset($this->get['title'])) {
             $where['title'] = $this->get['title'];
         }
-        if (isset($this->get['categoryId'])) {
-            $where['categoryId'] = $this->get['categoryId'];
-        }
+
         $list = $this->model->where($where)->where('status', '<>', Status::$Delete)->all();
         $data = $this->model->where($where)->where('status', '<>', Status::$Delete)->order('createTime', 'desc')->limit($offset * $limit, $limit)->all();
         //一定要调用一下，才有值
@@ -67,6 +65,8 @@ class Article extends Base {
         //如果有title这个属性的话，说明是筛选一条，那么给这条的点击数加1
         if (isset($this->get['title'])) {
             $data[0]->clickCount = $data[0]->clickCount + 1;
+            $msg = new Message();
+            $msg->create('你的文章《'.$data[0]->title.'》被点击了','你的文章《'.$data[0]->title.'》被点击了，当前总的点击数'. $data[0]->clickCount,'xxxx');
             $data[0]->save();
         }
         return success(['count' => count($list), 'list' => $data]);
@@ -112,5 +112,21 @@ class Article extends Base {
         return fail($result, '回收失败');
     }
 
-
+    //批量回收
+    public function trashMore() {
+        $failResult = [];
+        foreach ($this->data as $item) {
+            $post = $this->model->get($item['id']);
+            if (!$post) {
+                $failResult[] = $item;
+            } else {
+                $post->status = Status::$Delete;
+                $result = $post->save();
+                if (!$result) {
+                    $failResult[] = $item;
+                }
+            }
+        }
+        return success($failResult, '回收完成');
+    }
 }
