@@ -7,4 +7,5 @@ $baseDir = dirname($vendorDir);
 
 return array(
     '320cde22f66dd4f5d3fd621d3e88b98f' => $vendorDir . '/symfony/polyfill-ctype/bootstrap.php',
+    'ffc1d7141d4fcbaeb47a6929f0811ed1' => $vendorDir . '/topthink/think-worker/src/command.php',
 );

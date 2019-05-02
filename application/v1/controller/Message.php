@@ -11,6 +11,7 @@ namespace app\v1\controller;
 
 use app\common\model\MessageModel;
 use Ramsey\Uuid\Uuid;
+use think\Db;
 
 class Message extends Base {
     private $model;
@@ -32,6 +33,11 @@ class Message extends Base {
         $data['title'] = $title;
         $data['content'] = $content;
         $data['userId'] = $userId;
+        // 建立socket连接到内部推送端口
+        $client = stream_socket_client('tcp://127.0.0.1:5678');
+        fwrite($client, 'uid1'."\n");
+//        echo fread($client, 8192);
+
         return $this->model->save($data);
     }
 
@@ -46,6 +52,14 @@ class Message extends Base {
             return fail('', '没有这条数据');
         }
         $result = $msg->delete();
+        if ($result) {
+            return success($result, '删除成功');
+        }
+        return fail($result, '删除失败');
+    }
+
+    public function delAll() {
+        $result = Db::name('message')->delete(true);
         if ($result) {
             return success($result, '删除成功');
         }

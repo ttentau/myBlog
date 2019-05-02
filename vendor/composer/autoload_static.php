@@ -8,16 +8,22 @@ class ComposerStaticInit637b2d7d21cfd3b8645693e098845677
 {
     public static $files = array (
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
+        'ffc1d7141d4fcbaeb47a6929f0811ed1' => __DIR__ . '/..' . '/topthink/think-worker/src/command.php',
     );
 
     public static $prefixLengthsPsr4 = array (
         't' => 
         array (
+            'think\\worker\\' => 13,
             'think\\composer\\' => 15,
         ),
         'a' => 
         array (
             'app\\' => 4,
+        ),
+        'W' => 
+        array (
+            'Workerman\\' => 10,
         ),
         'S' => 
         array (
@@ -27,6 +33,10 @@ class ComposerStaticInit637b2d7d21cfd3b8645693e098845677
         array (
             'Ramsey\\Uuid\\' => 12,
         ),
+        'G' => 
+        array (
+            'GatewayWorker\\' => 14,
+        ),
         'F' => 
         array (
             'Firebase\\JWT\\' => 13,
@@ -34,6 +44,10 @@ class ComposerStaticInit637b2d7d21cfd3b8645693e098845677
     );
 
     public static $prefixDirsPsr4 = array (
+        'think\\worker\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/topthink/think-worker/src',
+        ),
         'think\\composer\\' => 
         array (
             0 => __DIR__ . '/..' . '/topthink/think-installer/src',
@@ -42,6 +56,11 @@ class ComposerStaticInit637b2d7d21cfd3b8645693e098845677
         array (
             0 => __DIR__ . '/../..' . '/application',
         ),
+        'Workerman\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/workerman/workerman',
+            1 => __DIR__ . '/..' . '/workerman/workerman-for-win',
+        ),
         'Symfony\\Polyfill\\Ctype\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-ctype',
@@ -49,6 +68,10 @@ class ComposerStaticInit637b2d7d21cfd3b8645693e098845677
         'Ramsey\\Uuid\\' => 
         array (
             0 => __DIR__ . '/..' . '/ramsey/uuid/src',
+        ),
+        'GatewayWorker\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/workerman/gateway-worker/src',
         ),
         'Firebase\\JWT\\' => 
         array (
