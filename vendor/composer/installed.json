@@ -240,17 +240,17 @@
     },
     {
         "name": "topthink/framework",
-        "version": "v5.1.35",
-        "version_normalized": "5.1.35.0",
+        "version": "v5.1.36",
+        "version_normalized": "5.1.36.0",
         "source": {
             "type": "git",
             "url": "https://github.com/top-think/framework.git",
-            "reference": "c53c0c6132022a87e8ee9c4109939eaf9a8a7adb"
+            "reference": "135eee67ce9ee0b07da201f743d7dd88ec431abb"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/top-think/framework/zipball/c53c0c6132022a87e8ee9c4109939eaf9a8a7adb",
-            "reference": "c53c0c6132022a87e8ee9c4109939eaf9a8a7adb",
+            "url": "https://api.github.com/repos/top-think/framework/zipball/135eee67ce9ee0b07da201f743d7dd88ec431abb",
+            "reference": "135eee67ce9ee0b07da201f743d7dd88ec431abb",
             "shasum": ""
         },
         "require": {
@@ -266,7 +266,7 @@
             "sebastian/phpcpd": "2.*",
             "squizlabs/php_codesniffer": "2.*"
         },
-        "time": "2019-03-03T00:44:44+00:00",
+        "time": "2019-04-28T08:56:58+00:00",
         "type": "think-framework",
         "installation-source": "dist",
         "notification-url": "https://packagist.org/downloads/",
@@ -336,26 +336,27 @@
     },
     {
         "name": "topthink/think-worker",
-        "version": "v2.0.11",
-        "version_normalized": "2.0.11.0",
+        "version": "v2.0.12",
+        "version_normalized": "2.0.12.0",
         "source": {
             "type": "git",
             "url": "https://github.com/top-think/think-worker.git",
-            "reference": "bee4408caf10a48df6a91e17f5b64f72a25bf1f8"
+            "reference": "922d8c95e2f095e0da66d18b9e3fbbfd8de70a3f"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/top-think/think-worker/zipball/bee4408caf10a48df6a91e17f5b64f72a25bf1f8",
-            "reference": "bee4408caf10a48df6a91e17f5b64f72a25bf1f8",
+            "url": "https://api.github.com/repos/top-think/think-worker/zipball/922d8c95e2f095e0da66d18b9e3fbbfd8de70a3f",
+            "reference": "922d8c95e2f095e0da66d18b9e3fbbfd8de70a3f",
             "shasum": ""
         },
         "require": {
+            "ext-fileinfo": "*",
             "topthink/framework": "^5.1.18",
             "topthink/think-installer": "^2.0",
             "workerman/gateway-worker": "^3.0.0",
-            "workerman/workerman": "^3.3.0"
+            "workerman/workerman": "^3.5.0"
         },
-        "time": "2018-09-14T05:56:22+00:00",
+        "time": "2019-03-08T11:22:34+00:00",
         "type": "think-extend",
         "extra": {
             "think-config": {

@@ -46,7 +46,7 @@ class Base extends Controller {
     }
 
     public function isInWhiteList($url) {
-        $whiteList = ['/v1/user/login', '/v1/article/show'];
+        $whiteList = ['/v1/user/login', '/v1/article/show','file/upload','comment/create','comment/index'];
         $result = false;
         foreach ($whiteList as $item) {
             if (strpos($url, $item) !== false) {
