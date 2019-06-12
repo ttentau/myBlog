@@ -7,6 +7,9 @@
         "thinkphp",
         "ORM"
     ],
+    "scripts": {
+        "server": "php think worker:server"
+    },
     "homepage": "http://thinkphp.cn/",
     "license": "Apache-2.0",
     "authors": [
