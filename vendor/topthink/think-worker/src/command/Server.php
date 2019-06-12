@@ -19,7 +19,7 @@ use think\console\Output;
 use think\facade\Config;
 use think\facade\Env;
 use think\worker\Server as WorkerServer;
-use Workerman\Worker as Worker2;
+use Workerman\Worker;
 
 /**
  * Worker Server 命令行类
@@ -72,7 +72,7 @@ class Server extends Command
             }
 
             // Run worker
-            Worker2::runAll();
+            Worker::runAll();
             return;
         }
 
@@ -94,7 +94,7 @@ class Server extends Command
             $context = [];
         }
 
-        $worker = new Worker2($socket, $context);
+        $worker = new Worker($socket, $context);
 
         if (empty($this->config['pidFile'])) {
             $this->config['pidFile'] = Env::get('runtime_path') . 'worker.pid';
@@ -105,7 +105,7 @@ class Server extends Command
 
         // 开启守护进程模式
         if ($this->input->hasOption('daemon')) {
-            Worker2::$daemonize = true;
+            Worker::$daemonize = true;
         }
 
         if (!empty($this->config['ssl'])) {
@@ -116,14 +116,14 @@ class Server extends Command
         // 设置服务器参数
         foreach ($this->config as $name => $val) {
             if (in_array($name, ['stdoutFile', 'daemonize', 'pidFile', 'logFile'])) {
-                Worker2::${$name} = $val;
+                Worker::${$name} = $val;
             } else {
                 $worker->$name = $val;
             }
         }
 
         // Run worker
-        Worker2::runAll();
+        Worker::runAll();
     }
 
     protected function startServer($class)

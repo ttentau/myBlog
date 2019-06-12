@@ -34,8 +34,8 @@ class Message extends Base {
         $data['content'] = $content;
         $data['userId'] = $userId;
         // 建立socket连接到内部推送端口
-        $client = stream_socket_client('tcp://127.0.0.1:5678');
-        fwrite($client, 'uid1'."\n");
+//        $client = stream_socket_client('tcp://127.0.0.1:5678');
+//        fwrite($client, 'uid1'."\n");
 //        echo fread($client, 8192);
 
         return $this->model->save($data);

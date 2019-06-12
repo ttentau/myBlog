@@ -4,6 +4,7 @@
 namespace app\v1\controller;
 
 
+use app\common\model\ConfigModel;
 use app\common\model\UserModel;
 use Ramsey\Uuid\Uuid;
 
@@ -57,5 +58,20 @@ class User extends Base {
             return success($this->data, '添加成功');
         }
         return fail('', '添加失败');
+    }
+
+    //获取配置信息
+    public function config() {
+        $config = model('configModel')->all();
+        return success($config[0], 'ok');
+    }
+
+    //获取配置信息
+    public function editConfig() {
+        $result = model('configModel')->allowField(true)->save($this->data, ['id' => $this->data['id']]);
+        if ($result) {
+            return success($this->data, '修改成功');
+        }
+        return fail('', '修改失败');
     }
 }

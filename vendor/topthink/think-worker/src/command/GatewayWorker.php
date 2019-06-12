@@ -20,7 +20,7 @@ use think\console\input\Argument;
 use think\console\input\Option;
 use think\console\Output;
 use think\facade\Config;
-use Workerman\Worker as Worker2;
+use Workerman\Worker;
 
 /**
  * Worker 命令行类
@@ -105,7 +105,7 @@ class GatewayWorker extends Command
             $this->gateway($registerAddress, $host, $port, $option);
         }
 
-        Worker2::runAll();
+        Worker::runAll();
     }
 
     /**
@@ -173,7 +173,7 @@ class GatewayWorker extends Command
         // 全局静态属性设置
         foreach ($option as $name => $val) {
             if (in_array($name, ['stdoutFile', 'daemonize', 'pidFile', 'logFile'])) {
-                Worker2::${$name} = $val;
+                Worker::${$name} = $val;
                 unset($option[$name]);
             }
         }

@@ -59,7 +59,7 @@ return [
         // 禁止访问模块
         'deny_module_list'       => ['common'],
         // 默认控制器名
-        'default_controller'     => 'Article',
+        'default_controller'     => 'Index',
         // 默认操作名
         'default_action'         => 'index',
         // 是否自动转换URL中的控制器和操作名
@@ -141,7 +141,7 @@ return [
         // 异常页面的模板文件
         'exception_tmpl'         => __DIR__ . '/tpl/think_exception.tpl',
         // 错误显示信息,非调试模式有效
-        'error_message'          => 'error',
+        'error_message'          => '页面错误！请稍后再试～',
         // 显示错误信息
         'show_error_msg'         => false,
         // 异常处理handle类 留空使用 \think\exception\Handle
