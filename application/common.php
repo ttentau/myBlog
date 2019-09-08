@@ -69,3 +69,8 @@ class  Status {
     public static $Delete = 1;
     public static $Hide = 2;
 }
+class  ArticleStatus {
+    public static $Normal = 0;
+    public static $Delete = 1;
+    public static $Top = 2;
+}

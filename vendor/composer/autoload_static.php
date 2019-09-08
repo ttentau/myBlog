@@ -7,6 +7,7 @@ namespace Composer\Autoload;
 class ComposerStaticInit637b2d7d21cfd3b8645693e098845677
 {
     public static $files = array (
+        '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
         'ffc1d7141d4fcbaeb47a6929f0811ed1' => __DIR__ . '/..' . '/topthink/think-worker/src/command.php',
     );
@@ -27,7 +28,10 @@ class ComposerStaticInit637b2d7d21cfd3b8645693e098845677
         ),
         'S' => 
         array (
+            'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Polyfill\\Ctype\\' => 23,
+            'Symfony\\Contracts\\Translation\\' => 30,
+            'Symfony\\Component\\Translation\\' => 30,
         ),
         'R' => 
         array (
@@ -40,6 +44,10 @@ class ComposerStaticInit637b2d7d21cfd3b8645693e098845677
         'F' => 
         array (
             'Firebase\\JWT\\' => 13,
+        ),
+        'C' => 
+        array (
+            'Carbon\\' => 7,
         ),
     );
 
@@ -61,9 +69,21 @@ class ComposerStaticInit637b2d7d21cfd3b8645693e098845677
             0 => __DIR__ . '/..' . '/workerman/workerman',
             1 => __DIR__ . '/..' . '/workerman/workerman-for-win',
         ),
+        'Symfony\\Polyfill\\Mbstring\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
+        ),
         'Symfony\\Polyfill\\Ctype\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-ctype',
+        ),
+        'Symfony\\Contracts\\Translation\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/translation-contracts',
+        ),
+        'Symfony\\Component\\Translation\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/translation',
         ),
         'Ramsey\\Uuid\\' => 
         array (
@@ -76,6 +96,10 @@ class ComposerStaticInit637b2d7d21cfd3b8645693e098845677
         'Firebase\\JWT\\' => 
         array (
             0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
+        ),
+        'Carbon\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon',
         ),
     );
 

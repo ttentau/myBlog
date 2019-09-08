@@ -5,24 +5,21 @@ namespace app\v1\controller;
 use app\common\model\ArticleModel;
 use app\common\model\CategoryModel;
 use app\common\model\MessageModel;
+use Carbon\Carbon;
 use Ramsey\Uuid\Uuid;
 use Status;
 
 class Article extends Base {
     private $model;
-    private $data;
-    private $get;
 
 
-    protected function initialize() {
+    public function initialize() {
         parent::initialize();
         $this->model = new ArticleModel();
-        $this->data = input('post.');
-        $this->get = input('get.');
     }
 
     //获取所有数据
-    public function index() {
+    public function select() {
         $offset = $this->get['offset'];
         $limit = $this->get['limit'];
         $where = [];
@@ -66,7 +63,7 @@ class Article extends Base {
         if (isset($this->get['title'])) {
             $data[0]->clickCount = $data[0]->clickCount + 1;
             $msg = new Message();
-            $msg->create('你的文章《'.$data[0]->title.'》被点击了','你的文章《'.$data[0]->title.'》被点击了，当前总的点击数'. $data[0]->clickCount,'xxxx');
+            $msg->create('你的文章《' . $data[0]->title . '》被点击了', '你的文章《' . $data[0]->title . '》被点击了，当前总的点击数' . $data[0]->clickCount, 'xxxx');
             $data[0]->save();
         }
         return success(['count' => count($list), 'list' => $data]);
@@ -75,14 +72,20 @@ class Article extends Base {
 
     //添加
     public function create() {
+        $this->checkHasProp($this->data, ['title' => '标题']);
+
         //检测数据库里是否已经存在这条数据
         $title = $this->data['title'];
-        $post = $this->model->where(['title' => $title])->find();
+        $post = db('article')->where(['title' => $title])->find();
         if ($post) {
             return fail($post, '标题不能重复');
         }
         $this->data['id'] = Uuid::uuid4()->toString();
-        $result = $this->model->allowField(true)->save($this->data);
+        $now = Carbon::now();
+        $this->data['createTime'] = $now->timestamp;
+        $this->data['updateTime'] = $now->timestamp;
+        $this->data['year'] = $now->year;
+        $result = db('article')->strict(false)->insert($this->data);
         if ($result) {
             return success($this->data, '添加成功');
         }
@@ -91,7 +94,18 @@ class Article extends Base {
 
     //编辑
     public function edit() {
-        $result = $this->model->allowField(true)->save($this->data, ['id' => $this->data['id']]);
+        $this->checkHasProp($this->data, ['title' => '标题']);
+
+        //检测数据库里是否已经存在这条数据
+        $title = $this->data['title'];
+        $post = db('article')->where(['title' => $title])->find();
+        if ($post) {
+            return fail($post, '标题不能重复');
+        }
+        $now = Carbon::now();
+        $this->data['createTime'] = $now->timestamp;
+        $this->data['year'] = $now->year;
+        $result = db('article')->where('id',$this->data['id'])->strict(false)->update($this->data);
         if ($result) {
             return success($this->data, '修改成功');
         }
@@ -100,16 +114,16 @@ class Article extends Base {
 
     //回收
     public function trash() {
-        $post = $this->model->get(input('get.id'));
+        $post = $this->model->get($this->get['id']);
         if (!$post) {
             return fail('', '没有这条数据');
         }
-        $post->status = Status::$Delete;
+        $post->status = \ArticleStatus::$Delete;
         $result = $post->save();
         if ($result) {
-            return success($post, '回收成功');
+            return success($post, '删除成功');
         }
-        return fail($result, '回收失败');
+        return fail($result, '删除失败');
     }
 
     //批量回收
@@ -120,13 +134,13 @@ class Article extends Base {
             if (!$post) {
                 $failResult[] = $item;
             } else {
-                $post->status = Status::$Delete;
+                $post->status = \ArticleStatus::$Delete;
                 $result = $post->save();
                 if (!$result) {
                     $failResult[] = $item;
                 }
             }
         }
-        return success($failResult, '回收完成');
+        return success($failResult, '删除成功');
     }
 }

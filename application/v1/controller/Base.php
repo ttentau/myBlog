@@ -15,12 +15,27 @@ use think\facade\Request;
 
 class Base extends Controller {
 
+    protected $token = null;
+    protected $data;
+    protected $get;
+    protected $userId;
+    protected $tokenData;
+
     public function __construct(App $app = null) {
         $this->checkRequestType();//一定要比tp先初始化
-        $this->checkRoute();
+//        $this->checkRoute();
         parent::__construct($app);
     }
 
+    public function initialize() {
+        parent::initialize();
+        $this->data = input('post.');
+        $this->get = input('get.');
+        $this->userId = input('post.userId');
+        if (!$this->userId) {
+            $this->userId = input('get.userId');
+        }
+    }
 
     //检测option请求
     public function checkRequestType() {
@@ -31,22 +46,33 @@ class Base extends Controller {
     }
 
     public function checkRoute() {
-        $token = Request::header('access-token');
-//        d($token);
+        $this->token = Request::header('access-token');
+//        d($this->token);
 //        $token = substr($token, 7, strlen($token));
         if ($this->isInWhiteList(Request::baseUrl())) {
             //路由白名单
         } else {
-            $result = verifyToken($token);
-            if (!$result) {
-                response(["status" => -1, "msg" => 'token失效', "data" => []], 401, [], 'json')->send();
+            if (!$this->token) {
+                response(["code" => -1, "msg" => 'token失效', "data" => []], 200, [], 'json')->send();
                 die();
+            }
+            $result = verifyToken($this->token);
+            if (!$result) {
+                response(["code" => -1, "msg" => 'token失效', "data" => []], 401, [], 'json')->send();
+                die();
+            } else {
+                $this->tokenData = decryptionToken($this->token)->id;
             }
         }
     }
 
     public function isInWhiteList($url) {
-        $whiteList = ['/v1/user/login', '/v1/article/show','file/upload','comment/create','comment/index'];
+        $whiteList = [
+            '/v1/user/login',
+            '/v1/article/show',
+            'file/upload',
+            'comment/create',
+            'comment/index'];
         $result = false;
         foreach ($whiteList as $item) {
             if (strpos($url, $item) !== false) {
@@ -58,5 +84,20 @@ class Base extends Controller {
             }
         }
         return $result;
+    }
+
+
+//    检测是否有这个属性
+    public function checkHasProp($data, $props) {
+        foreach ($props as $key => $value) {
+            if (!isset($data[$key])) {
+                response(["code" => '999999', "msg" => '缺少' . $value, "data" => []], 200, [], 'json')->send();
+                die();
+            }
+            if ($data[$key] === '') {
+                response(["code" => '999999', "msg" => $value . '不能为空', "data" => []], 200, [], 'json')->send();
+                die();
+            }
+        }
     }
 }
