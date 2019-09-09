@@ -43,17 +43,17 @@ function verifyToken($jwt) {
 }
 
 
-function success($data = "", $msg = "", $status = 1) {
+function success($data = "", $msg = "", $code = '000000') {
     return json([
-        "status" => $status,
+        "code" => $code,
         "msg" => $msg,
         "data" => $data,
     ]);
 }
 
-function fail($data = "", $msg = "", $status = -1) {
+function fail($data = "", $msg = "", $code = '999999') {
     return json([
-        "status" => $status,
+        "code" => $code,
         "msg" => $msg,
         "data" => $data,
     ]);

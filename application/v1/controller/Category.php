@@ -10,22 +10,30 @@ use Status;
 class Category extends Base {
 
     private $model;
-    private $data;
-    private $get;
 
-
-    protected function initialize() {
+    public function initialize() {
         parent::initialize();
         $this->model = new CategoryModel();
-        $this->data = input('post.');
-        $this->get = input('get.');
 
     }
 
     //获取所有数据
-    public function index() {
-        $list = $this->model->all();
-        return success(['count' => count($list), 'list' => $list]);
+    public function select() {
+
+        $db = db('category');
+        $list = $db
+            ->select();
+
+        $data = $db
+            ->page($this->offset,$this->limit)
+            ->select();
+
+        return success(['count' => count($list), 'list' => $data]);
+    }
+
+    public function detail(){
+        $res = db('category')->where('id',$this->get['id'])->find();
+        return success($res);
     }
 
 
@@ -37,6 +45,7 @@ class Category extends Base {
             return fail($category, '已经存在这条数据了');
         }
         $this->data['id'] = Uuid::uuid4()->toString();
+        $this->data['createTime'] = time();
         $result = $this->model->allowField(true)->save($this->data);
         if ($result) {
             return success($this->data, '添加成功');
@@ -45,22 +54,22 @@ class Category extends Base {
     }
 
     public function del() {
-        $category = $this->model->get($this->get['id']);
-        if (!$category) {
-            return fail('', '没有这条数据');
-        }
-        $articles = model('ArticleModel')->where(['categoryId' => $category->id])->all();
-        if (count($articles)){
-            foreach ($articles as $article){
-                $article->category;
-            }
-            return fail($articles, '还有关联的文章');
-        }
-        $result = $category->delete();
+        $result = db('category')
+            ->where('id',$this->get['id'])
+            ->delete();
         if ($result) {
             return success($result, '删除成功');
         }
         return fail($result, '删除失败');
+    }
+
+
+    //批量回收
+    public function delMore() {
+        foreach ($this->data as $item) {
+            db('category')->where('id',$item['id'])->delete();
+        }
+        return success(null, '删除成功');
     }
 
     public function edit() {

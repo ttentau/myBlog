@@ -26,13 +26,18 @@ class Article extends Base {
         if (isset($this->get['title'])) {
             $where['title'] = $this->get['title'];
         }
+        $db = db('article');
+        $list = $db
+            ->alias('a')
+            ->field('a.*,c.name')
+            ->join('category c', 'c.id = a.categoryId')
+            ->where($where)
+            ->select();
 
-        $list = $this->model->where($where)->where('status', '<>', Status::$Delete)->all();
-        $data = $this->model->where($where)->where('status', '<>', Status::$Delete)->order('createTime', 'desc')->limit($offset * $limit, $limit)->all();
-        //一定要调用一下，才有值
-        foreach ($data as &$item) {
-            $item->category;
-        }
+        $data = $db
+            ->limit($offset * $limit, $limit)
+            ->select();
+
         return success(['count' => count($list), 'list' => $data]);
     }
 
@@ -105,7 +110,7 @@ class Article extends Base {
         $now = Carbon::now();
         $this->data['createTime'] = $now->timestamp;
         $this->data['year'] = $now->year;
-        $result = db('article')->where('id',$this->data['id'])->strict(false)->update($this->data);
+        $result = db('article')->where('id', $this->data['id'])->strict(false)->update($this->data);
         if ($result) {
             return success($this->data, '修改成功');
         }
@@ -113,7 +118,7 @@ class Article extends Base {
     }
 
     //回收
-    public function trash() {
+    public function del() {
         $post = $this->model->get($this->get['id']);
         if (!$post) {
             return fail('', '没有这条数据');
@@ -127,7 +132,7 @@ class Article extends Base {
     }
 
     //批量回收
-    public function trashMore() {
+    public function delMore() {
         $failResult = [];
         foreach ($this->data as $item) {
             $post = $this->model->get($item['id']);

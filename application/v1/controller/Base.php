@@ -20,6 +20,8 @@ class Base extends Controller {
     protected $get;
     protected $userId;
     protected $tokenData;
+    protected $offset;
+    protected $limit;
 
     public function __construct(App $app = null) {
         $this->checkRequestType();//一定要比tp先初始化
@@ -34,6 +36,12 @@ class Base extends Controller {
         $this->userId = input('post.userId');
         if (!$this->userId) {
             $this->userId = input('get.userId');
+        }
+        if (request()->method() == 'GET') {
+            if (isset($this->get['offset'])) {
+                $this->offset = $this->get['offset'];
+                $this->limit = $this->get['limit'];
+            }
         }
     }
 
