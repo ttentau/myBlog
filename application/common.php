@@ -72,5 +72,4 @@ class  Status {
 class  ArticleStatus {
     public static $Normal = 0;
     public static $Delete = 1;
-    public static $Top = 2;
 }

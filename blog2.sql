@@ -4,20 +4,22 @@ use blog;
 drop table if exists article;
 create table article
 (
-    id           varchar(36)                not null primary key,
-    title        text                       null comment '名字',
-    summary      text                       null comment '简介',
-    mdContent    text                       null comment 'md格式的内容',
-    htmlContent  text                       null comment 'html 格式的内容',
-    author       varchar(15) default ''     null comment '作者',
-    status       int         default 0      null comment '状态，0：正常，1：删除，2：置顶',
-    isCanComment int         default 1      null comment '是否可评论，0：不可评论，1：可评论',
-    sort         int         default 0      null comment '排序',
-    clickCount   int         default 0      null comment '点击量',
-    categoryId   varchar(36) default ''     null comment '分类 ID',
-    year         varchar(4)  default '2019' null comment '年份',
-    createTime   int                        not null comment '创建时间',
-    updateTime   int                        not null comment '更新时间'
+    id               varchar(36)                not null primary key,
+    title            text                       null comment '名字',
+    summary          text                       null comment '简介',
+    mdContent        text                       null comment 'md格式的内容',
+    htmlContent      text                       null comment 'html 格式的内容',
+    author           varchar(15) default ''     null comment '作者',
+    status           int         default 0      null comment '状态，0：正常，1：删除，',
+    isCanComment     boolean     default true   null comment '是否可评论，0：不可评论，1：可评论',
+    isMarkdownEditor boolean     default false  null comment '是否是 md 编辑器，0：不可，1：可',
+    isTop            boolean     default false  null comment '是否置顶，0：不可，1：可',
+    sort             int         default 0      null comment '排序',
+    clickCount       int         default 0      null comment '点击量',
+    categoryId       varchar(36) default ''     null comment '分类 ID',
+    year             varchar(4)  default '2019' null comment '年份',
+    createTime       int                        not null comment '创建时间',
+    updateTime       int                        not null comment '更新时间'
 );
 
 
@@ -74,8 +76,8 @@ create table message
     id         varchar(36)   not null primary key,
     title      text          null,
     content    text          null,
-    toUserId     varchar(36)   not null,
-    fromUserId     varchar(36)   not null,
+    toUserId   varchar(36)   not null,
+    fromUserId varchar(36)   not null,
     hasRead    int default 0 null,
     createTime int           null
 );

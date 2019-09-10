@@ -20,11 +20,9 @@ class Article extends Base {
 
     //获取所有数据
     public function select() {
-        $offset = $this->get['offset'];
-        $limit = $this->get['limit'];
         $where = [];
         if (isset($this->get['title'])) {
-            $where['title'] = $this->get['title'];
+            $where[] = ['title', 'like', '%' . $this->get['title'] . '%'];
         }
         $db = db('article');
         $list = $db
@@ -32,46 +30,53 @@ class Article extends Base {
             ->field('a.*,c.name')
             ->join('category c', 'c.id = a.categoryId')
             ->where($where)
+            ->where('status',\ArticleStatus::$Normal)
             ->select();
 
         $data = $db
-            ->limit($offset * $limit, $limit)
+            ->page($this->offset,$this->limit)
             ->select();
 
         return success(['count' => count($list), 'list' => $data]);
     }
 
-    //获取一条数据
-    public function one() {
-        $data = $this->model->find(['id' => $this->get['id']]);
-        //一定要调用一下，才有值
-        $data->category;
-        return success(['count' => 1, 'list' => $data]);
+    //后台修改获取的详情
+    public function editDetail() {
+        $res = db('article')->where('id', $this->get['id'])->find();
+        $res['isCanComment'] = $res['isCanComment'] ? true : false;
+        $res['isMarkdownEditor'] = $res['isMarkdownEditor'] ? true : false;
+        $res['isTop'] = $res['isTop'] ? true : false;
+        $tags = db('article_relation_tag')
+            ->alias('art')
+            ->field('t.*')
+            ->join('tag t', 't.id = art.tagId')
+            ->where('art.articleId', $res['id'])
+            ->select();
+        foreach ($tags as $tag) {
+            $res['tags'][] = $tag['id'];
+        }
+        return success($res);
     }
 
-    //获取所有可见的帖子
-    public function show() {
-        $offset = $this->get['offset'];
-        $limit = $this->get['limit'];
-        $where = [];
-        if (isset($this->get['title'])) {
-            $where['title'] = $this->get['title'];
-        }
-        $list = $this->model->where($where)->where(['status' => Status::$Normal])->all();
-        $data = $this->model->where($where)->where(['status' => Status::$Normal])->order('createTime', 'desc')->limit($offset * $limit, $limit)->all();
-        //一定要调用一下，才有值
-        foreach ($data as &$item) {
-            $item->category;
-        }
-
-        //如果有title这个属性的话，说明是筛选一条，那么给这条的点击数加1
-        if (isset($this->get['title'])) {
-            $data[0]->clickCount = $data[0]->clickCount + 1;
-            $msg = new Message();
-            $msg->create('你的文章《' . $data[0]->title . '》被点击了', '你的文章《' . $data[0]->title . '》被点击了，当前总的点击数' . $data[0]->clickCount, 'xxxx');
-            $data[0]->save();
-        }
-        return success(['count' => count($list), 'list' => $data]);
+    //后台预览获取的详情
+    public function previewDetail() {
+        $res = db('article')
+            ->alias('a')
+            ->field('a.*,c.name categoryName')
+            ->join('category c', 'c.id = a.categoryId')
+            ->where('a.id', $this->get['id'])
+            ->find();
+        $res['isCanComment'] = $res['isCanComment'] ? true : false;
+        $res['isMarkdownEditor'] = $res['isMarkdownEditor'] ? true : false;
+        $res['isTop'] = $res['isTop'] ? true : false;
+        $tags = db('article_relation_tag')
+            ->alias('art')
+            ->field('t.*')
+            ->join('tag t', 't.id = art.tagId')
+            ->where('art.articleId', $res['id'])
+            ->select();
+        $res['tags'] = $tags;
+        return success($res);
     }
 
 
@@ -90,7 +95,22 @@ class Article extends Base {
         $this->data['createTime'] = $now->timestamp;
         $this->data['updateTime'] = $now->timestamp;
         $this->data['year'] = $now->year;
+        if ($this->data['isMarkdownEditor']) {
+            $this->data['htmlContent'] = '';
+        } else {
+            $this->data['mdContent'] = '';
+        }
+        $tags = $this->data['tags'];
+        foreach ($tags as $tag) {
+            $art = [];
+            $art['id'] = Uuid::uuid4()->toString();
+            $art['articleId'] = $this->data['id'];
+            $art['tagId'] = $tag;
+            $art['createTime'] = time();
+            db('article_relation_tag')->strict(false)->insert($art);
+        }
         $result = db('article')->strict(false)->insert($this->data);
+
         if ($result) {
             return success($this->data, '添加成功');
         }
@@ -99,17 +119,30 @@ class Article extends Base {
 
     //编辑
     public function edit() {
-        $this->checkHasProp($this->data, ['title' => '标题']);
-
         //检测数据库里是否已经存在这条数据
-        $title = $this->data['title'];
-        $post = db('article')->where(['title' => $title])->find();
+        $post = db('article')->where(['id' => $this->data['id']])->find();
         if ($post) {
-            return fail($post, '标题不能重复');
+//            return fail($post, '标题不能重复');
         }
         $now = Carbon::now();
-        $this->data['createTime'] = $now->timestamp;
+        $this->data['updateTime'] = $now->timestamp;
         $this->data['year'] = $now->year;
+        if ($this->data['isMarkdownEditor']) {
+            $this->data['htmlContent'] = '';
+        } else {
+            $this->data['mdContent'] = '';
+        }
+
+        db('article_relation_tag')->where('articleId', $post['id'])->delete();
+        $tags = $this->data['tags'];
+        foreach ($tags as $tag) {
+            $art = [];
+            $art['id'] = Uuid::uuid4()->toString();
+            $art['articleId'] = $this->data['id'];
+            $art['tagId'] = $tag;
+            $art['createTime'] = time();
+            db('article_relation_tag')->strict(false)->insert($art);
+        }
         $result = db('article')->where('id', $this->data['id'])->strict(false)->update($this->data);
         if ($result) {
             return success($this->data, '修改成功');
@@ -117,35 +150,26 @@ class Article extends Base {
         return fail('', '修改失败');
     }
 
-    //回收
+
     public function del() {
-        $post = $this->model->get($this->get['id']);
-        if (!$post) {
-            return fail('', '没有这条数据');
-        }
-        $post->status = \ArticleStatus::$Delete;
-        $result = $post->save();
-        if ($result) {
-            return success($post, '删除成功');
-        }
-        return fail($result, '删除失败');
+        $this->model->del($this->get['id']);
+        return success(null, '删除成功');
     }
+
 
     //批量回收
     public function delMore() {
-        $failResult = [];
         foreach ($this->data as $item) {
-            $post = $this->model->get($item['id']);
-            if (!$post) {
-                $failResult[] = $item;
-            } else {
-                $post->status = \ArticleStatus::$Delete;
-                $result = $post->save();
-                if (!$result) {
-                    $failResult[] = $item;
-                }
-            }
+            $this->model->del($item['id']);
         }
-        return success($failResult, '删除成功');
+        return success(null, '删除成功');
+    }
+
+
+    //获取分类和标签
+    public function tagAndCategoryList() {
+        $tags = db('tag')->select();
+        $categories = db('category')->select();
+        return success(['tags' => $tags, 'categories' => $categories]);
     }
 }
