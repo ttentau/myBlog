@@ -27,8 +27,8 @@ class Article extends Base {
         $db = db('article');
         $list = $db
             ->alias('a')
-            ->field('a.*,c.name')
-            ->join('category c', 'c.id = a.categoryId')
+            ->field('a.*,c.name categoryName')
+            ->leftJoin('category c', 'c.id = a.categoryId')
             ->where($where)
             ->where('status',\ArticleStatus::$Normal)
             ->select();
@@ -63,7 +63,7 @@ class Article extends Base {
         $res = db('article')
             ->alias('a')
             ->field('a.*,c.name categoryName')
-            ->join('category c', 'c.id = a.categoryId')
+            ->leftJoin('category c', 'c.id = a.categoryId')
             ->where('a.id', $this->get['id'])
             ->find();
         $res['isCanComment'] = $res['isCanComment'] ? true : false;
@@ -95,11 +95,11 @@ class Article extends Base {
         $this->data['createTime'] = $now->timestamp;
         $this->data['updateTime'] = $now->timestamp;
         $this->data['year'] = $now->year;
-        if ($this->data['isMarkdownEditor']) {
-            $this->data['htmlContent'] = '';
-        } else {
-            $this->data['mdContent'] = '';
-        }
+//        if ($this->data['isMarkdownEditor']) {
+//            $this->data['htmlContent'] = '';
+//        } else {
+//            $this->data['mdContent'] = '';
+//        }
         $tags = $this->data['tags'];
         foreach ($tags as $tag) {
             $art = [];
@@ -127,22 +127,25 @@ class Article extends Base {
         $now = Carbon::now();
         $this->data['updateTime'] = $now->timestamp;
         $this->data['year'] = $now->year;
-        if ($this->data['isMarkdownEditor']) {
-            $this->data['htmlContent'] = '';
-        } else {
-            $this->data['mdContent'] = '';
+//        if ($this->data['isMarkdownEditor']) {
+//            $this->data['htmlContent'] = '';
+//        } else {
+//            $this->data['mdContent'] = '';
+//        }
+
+        if (isset($this->data['tags'])){
+            db('article_relation_tag')->where('articleId', $post['id'])->delete();
+            $tags = $this->data['tags'];
+            foreach ($tags as $tag) {
+                $art = [];
+                $art['id'] = Uuid::uuid4()->toString();
+                $art['articleId'] = $this->data['id'];
+                $art['tagId'] = $tag;
+                $art['createTime'] = time();
+                db('article_relation_tag')->strict(false)->insert($art);
+            }
         }
 
-        db('article_relation_tag')->where('articleId', $post['id'])->delete();
-        $tags = $this->data['tags'];
-        foreach ($tags as $tag) {
-            $art = [];
-            $art['id'] = Uuid::uuid4()->toString();
-            $art['articleId'] = $this->data['id'];
-            $art['tagId'] = $tag;
-            $art['createTime'] = time();
-            db('article_relation_tag')->strict(false)->insert($art);
-        }
         $result = db('article')->where('id', $this->data['id'])->strict(false)->update($this->data);
         if ($result) {
             return success($this->data, '修改成功');
