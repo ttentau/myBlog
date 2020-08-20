@@ -12,7 +12,7 @@ class Trash extends Base {
     private $get;
 
 
-    protected function initialize() {
+    public function initialize() {
         parent::initialize();
         $this->model = new ArticleModel();
         $this->data = input('post.');

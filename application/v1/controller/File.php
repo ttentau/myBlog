@@ -56,13 +56,14 @@ class File extends Base {
             case 'JPEG':
             case 'GIF':
             case 'SVG':
+                echo time() . pathinfo($fileName, PATHINFO_EXTENSION);
                 $url = 'images';
 //                $info = $file->move('./static/uploads/images');
                 $dir = './static/uploads/images/' . date('Ymd');
                 if (!is_dir($dir)) {
                     mkdir($dir);
                 }
-                $info = $file->move($dir, $fileNameNew);
+                $info = $file->move($dir, time() . pathinfo($fileName, PATHINFO_EXTENSION));
                 break;
             case 'mp4':
             case 'mp3':
@@ -122,7 +123,9 @@ class File extends Base {
 
         $fileInfo = $file->getInfo();
         $fileName = $fileInfo['name'];
-        $fileNameNew = iconv('utf-8', 'gb2312', $fileName);
+
+
+        $fileNameNew = time() . md5($fileName) . '.' . pathinfo($fileName, PATHINFO_EXTENSION);
 
         $dir = './static/uploads/images/' . date('Ymd');
         if (!is_dir($dir)) {
@@ -130,7 +133,7 @@ class File extends Base {
         }
         $info = $file->move($dir, $fileNameNew);
 
-        $imgUrl = 'images' . DIRECTORY_SEPARATOR . date('Ymd') . DIRECTORY_SEPARATOR . $fileName;
+        $imgUrl = 'images' . DIRECTORY_SEPARATOR . date('Ymd') . DIRECTORY_SEPARATOR . $fileNameNew;
 
         $image = Image::open($dir . DIRECTORY_SEPARATOR . $fileNameNew);
         if ($cropArr) {

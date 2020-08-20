@@ -43,7 +43,7 @@ function verifyToken($jwt) {
 }
 
 
-function success($data = "", $msg = "", $code = '000000') {
+function success($data = "", $msg = "", $code = 0) {
     return json([
         "code" => $code,
         "msg" => $msg,
@@ -51,7 +51,7 @@ function success($data = "", $msg = "", $code = '000000') {
     ]);
 }
 
-function fail($data = "", $msg = "", $code = '999999') {
+function fail($data = "", $msg = "", $code = -1) {
     return json([
         "code" => $code,
         "msg" => $msg,
@@ -69,6 +69,7 @@ class  Status {
     public static $Delete = 1;
     public static $Hide = 2;
 }
+
 class  ArticleStatus {
     public static $Normal = 0;
     public static $Delete = 1;

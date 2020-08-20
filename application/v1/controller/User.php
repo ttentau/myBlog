@@ -14,7 +14,7 @@ class User extends Base {
     private $get;
 
 
-    protected function initialize() {
+    public function initialize() {
         parent::initialize();
         $this->model = new UserModel();
         $this->data = input('post.');

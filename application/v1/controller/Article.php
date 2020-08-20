@@ -30,14 +30,55 @@ class Article extends Base {
             ->field('a.*,c.name categoryName')
             ->leftJoin('category c', 'c.id = a.categoryId')
             ->where($where)
-            ->where('status',\ArticleStatus::$Normal)
+            ->where('status', \ArticleStatus::$Normal)
             ->select();
 
         $data = $db
-            ->page($this->offset,$this->limit)
+            ->page($this->offset, $this->limit)
             ->select();
 
+        foreach ($data as &$datum) {
+            $tags = db('article_relation_tag')
+                ->alias('art')
+                ->field('t.*')
+                ->join('tag t', 't.id = art.tagId')
+                ->where('art.articleId', $datum['id'])
+                ->select();
+            $datum['tags'] = $tags;
+        }
+
         return success(['count' => count($list), 'list' => $data]);
+    }
+
+    //获取归档数据
+    public function archive() {
+        $list = db('article')
+            ->alias('a')
+            ->field('a.*,c.name categoryName')
+            ->leftJoin('category c', 'c.id = a.categoryId')
+            ->where('status', \ArticleStatus::$Normal)
+            ->order('updateTime', 'desc')
+            ->select();
+
+        foreach ($list as &$datum) {
+            $tags = db('article_relation_tag')
+                ->alias('art')
+                ->field('t.*')
+                ->join('tag t', 't.id = art.tagId')
+                ->where('art.articleId', $datum['id'])
+                ->select();
+            $datum['tags'] = $tags;
+        }
+
+        $years = [];
+        foreach ($list as $item) {
+            if (!isset($years[$item['year']])) {
+                $years[$item['year']] = [];
+            }
+            $years[$item['year']][] = $item;
+        }
+
+        return success($years);
     }
 
     //后台修改获取的详情
@@ -133,7 +174,7 @@ class Article extends Base {
 //            $this->data['mdContent'] = '';
 //        }
 
-        if (isset($this->data['tags'])){
+        if (isset($this->data['tags'])) {
             db('article_relation_tag')->where('articleId', $post['id'])->delete();
             $tags = $this->data['tags'];
             foreach ($tags as $tag) {

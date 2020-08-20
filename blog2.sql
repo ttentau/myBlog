@@ -69,15 +69,3 @@ create table user
     status        int         default 0  null,
     isAdmin       int         default 0  null
 );
-
-drop table if exists message;
-create table message
-(
-    id         varchar(36)   not null primary key,
-    title      text          null,
-    content    text          null,
-    toUserId   varchar(36)   not null,
-    fromUserId varchar(36)   not null,
-    hasRead    int default 0 null,
-    createTime int           null
-);
