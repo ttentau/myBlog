@@ -19,7 +19,7 @@
     "dayjs": "^1.8.15",
     "echarts": "^4.2.1",
     "element-ui": "^2.10.1",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.21",
     "mavon-editor": "^2.7.5",
     "mockjs": "^1.0.1-beta3",
     "v-charts": "^1.19.0",
